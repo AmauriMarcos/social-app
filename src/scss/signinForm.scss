@@ -1,0 +1,31 @@
+.signIn {
+  /*   margin: 2rem; */
+}
+
+.subtitle {
+  font-size: 0.9rem;
+  color: #c6c6c6;
+}
+
+.link {
+  color: #78a9ff;
+  text-decoration: none;
+
+  &:hover {
+    color: #a6c8ff;
+  }
+}
+
+.css-1nccs9a-MuiFormHelperText-root.Mui-error {
+  color: #fa4d56 !important;
+}
+
+.css-fvhuv6-MuiButtonBase-root-MuiButton-root {
+  background-color: #6f65fd !important;
+
+  color: #f4f4f4 !important;
+
+  &:hover {
+    background-color: #5f55ea !important;
+  }
+}
