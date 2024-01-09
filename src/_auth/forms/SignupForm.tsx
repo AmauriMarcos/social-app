@@ -6,46 +6,53 @@ import {
   TextField,
   FormControl,
   Box,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
 import "../../scss/signinForm.scss";
 import { Link } from "react-router-dom";
 import { MarkEmailReadSharp } from "@mui/icons-material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import useValidation from "../../utils/useValidation";
 
 const SignupForm = () => {
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
-  const [nameError, setNameError] = useState("");
-  const [usernameError, setUsernameError] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
+  const {
+    nameError,
+    usernameError,
+    emailError,
+    passwordError,
+    validateName,
+    validateUsername,
+    validateEmail,
+    validatePassword,
+  } = useValidation();
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+  };
 
   const handleSubmit = () => {
-    setNameError("");
-    setUsernameError("");
-    setEmailError("");
-    setPasswordError("");
+    const isNameValid = validateName(name);
+    const isUsernameValid = validateUsername(username);
+    const isEmailValid = validateEmail(email);
+    const isPasswordValid = validatePassword(password);
 
-    let isValid = true;
-
-    if (name.trim().length === 0) {
-      setNameError("Name cannot be empty");
-      isValid = false;
-    }
-    if (username.length <= 2) {
-      setUsernameError("Username must contain at least 3 characters");
-      isValid = false;
-    }
-    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
-    if (!emailRegex.test(email)) {
-      setEmailError("Please enter a valid email");
-      isValid = false;
-    }
-    if (password.length < 6 || password.length > 12) {
-      setPasswordError("Password must contain between 6 to 12 characters");
-      isValid = false;
+    if (isNameValid && isUsernameValid && isEmailValid && isPasswordValid) {
+      console.log("Name:", name);
+      console.log("Username:", username);
+      console.log("Email:", email);
+      console.log("Password:", password);
     }
   };
 
@@ -86,11 +93,7 @@ const SignupForm = () => {
           onChange={(e) => {
             const newName = e.target.value;
             setName(newName);
-            if (newName.length > 0) {
-              setNameError("");
-            } else {
-              setNameError("Name cannot be empty");
-            }
+            validateName(newName);
           }}
           value={name}
           error={nameError.length > 0}
@@ -103,11 +106,7 @@ const SignupForm = () => {
           onChange={(e) => {
             const newUsername = e.target.value;
             setUsername(newUsername);
-            if (newUsername.length >= 2) {
-              setUsernameError("");
-            } else {
-              setUsernameError("Username must contain at least 3 characters");
-            }
+            validateUsername(newUsername);
           }}
           value={username}
           error={usernameError.length > 0}
@@ -120,13 +119,7 @@ const SignupForm = () => {
           onChange={(e) => {
             const newEmail = e.target.value;
             setEmail(newEmail);
-
-            const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
-            if (emailRegex.test(newEmail)) {
-              setEmailError("");
-            } else {
-              setEmailError("Please enter a valid email");
-            }
+            validateEmail(newEmail);
           }}
           value={email}
           error={emailError.length > 0}
@@ -134,24 +127,32 @@ const SignupForm = () => {
         />
         <TextField
           label="Password"
-          type="password"
           autoComplete="current-password"
           variant="filled"
           sx={{ width: "50%" }}
           onChange={(e) => {
             const newPassword = e.target.value;
             setPassword(newPassword);
-            if (newPassword.length >= 6 && newPassword.length <= 12) {
-              setPasswordError("");
-            } else {
-              setPasswordError(
-                "Password must contain between 6 to 12 characters"
-              );
-            }
+            validatePassword(newPassword);
           }}
           value={password}
           error={passwordError.length > 0}
           helperText={passwordError}
+          type={showPassword ? "text" : "password"}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={handleClickShowPassword}
+                  onMouseDown={handleMouseDownPassword}
+                  edge="end"
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
         <Button
           variant="contained"

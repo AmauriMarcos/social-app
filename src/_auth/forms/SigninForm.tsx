@@ -6,11 +6,39 @@ import {
   TextField,
   FormControl,
   Box,
+  InputAdornment,
+  IconButton,
 } from "@mui/material";
 import "../../scss/signinForm.scss";
 import { Link } from "react-router-dom";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import useValidation from "../../utils/useValidation";
 
 const SigninForm = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  const { emailError, passwordError, validateEmail, validatePassword } = useValidation();
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const handleMouseDownPassword = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+  };
+
+  const handleSubmit = () => {
+    const isEmailValid = validateEmail(email);
+    const isPasswordValid = validatePassword(password);
+
+    if (isEmailValid && isPasswordValid) {
+      console.log("Email:", email);
+      console.log("Password:", password);
+    }
+  };
   return (
     <Box className="signIn" sx={{ height: "100%", width: "100%" }}>
       <FormControl
@@ -40,20 +68,52 @@ const SigninForm = () => {
           <p className="subtitle">Welcome back! Please enter your details.</p>
         </Box>
         <TextField
-          id="outlined-required"
           label="Email"
           variant="filled"
           sx={{ width: "50%" }}
+          onChange={(e) => {
+            const newEmail = e.target.value;
+            setEmail(newEmail);
+            validateEmail(newEmail);
+          }}
+          value={email}
+          error={emailError.length > 0}
+          helperText={emailError}
         />
         <TextField
-          id="outlined-password-input"
           label="Password"
-          type="password"
           autoComplete="current-password"
           variant="filled"
           sx={{ width: "50%" }}
+          onChange={(e) => {
+            const newPassword = e.target.value;
+            setPassword(newPassword);
+            validatePassword(newPassword);
+          }}
+          value={password}
+          error={passwordError.length > 0}
+          helperText={passwordError}
+          type={showPassword ? "text" : "password"}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={handleClickShowPassword}
+                  onMouseDown={handleMouseDownPassword}
+                  edge="end"
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
-        <Button variant="contained" sx={{ width: "50%" }}>
+        <Button
+          variant="contained"
+          sx={{ width: "50%" }}
+          onClick={handleSubmit}
+        >
           Log in
         </Button>
         <Box sx={{ display: "flex", alignItems: "center", gap: ".5rem" }}>
