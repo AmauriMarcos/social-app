@@ -8,6 +8,7 @@ import {
   Box,
   InputAdornment,
   IconButton,
+  CircularProgress,
 } from "@mui/material";
 import "../../scss/signinForm.scss";
 import { Link } from "react-router-dom";
@@ -15,6 +16,7 @@ import { MarkEmailReadSharp } from "@mui/icons-material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import useValidation from "../../utils/useValidation";
+import { createUserAccount } from "../../lib/appwrite/api";
 
 const SignupForm = () => {
   const [name, setName] = useState("");
@@ -22,6 +24,7 @@ const SignupForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     nameError,
@@ -42,17 +45,23 @@ const SignupForm = () => {
     event.preventDefault();
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    setIsLoading(true);
     const isNameValid = validateName(name);
     const isUsernameValid = validateUsername(username);
     const isEmailValid = validateEmail(email);
     const isPasswordValid = validatePassword(password);
 
     if (isNameValid && isUsernameValid && isEmailValid && isPasswordValid) {
-      console.log("Name:", name);
-      console.log("Username:", username);
-      console.log("Email:", email);
-      console.log("Password:", password);
+      const values = {
+        name,
+        username,
+        email,
+        password,
+      };
+      const newUser = await createUserAccount(values);
+      setIsLoading(false);
+      console.log("New user:", newUser);
     }
   };
 
@@ -83,7 +92,7 @@ const SignupForm = () => {
           </Box>
           <h2>Create a new account</h2>
           <p className="subtitle">
-            To use snapgram, Please enter your details.
+            To use snapgram, please enter your details.
           </p>
         </Box>
         <TextField
@@ -154,13 +163,24 @@ const SignupForm = () => {
             ),
           }}
         />
-        <Button
-          variant="contained"
-          sx={{ width: "50%" }}
-          onClick={handleSubmit}
-        >
-          Sign up
-        </Button>
+        {isLoading ? (
+          <Button variant="contained" sx={{ width: "50%" }}>
+            <CircularProgress
+              color="inherit"
+              style={{ width: "24px", height: "24px", marginRight: "1rem" }}
+            />{" "}
+            Loading...
+          </Button>
+        ) : (
+          <Button
+            variant="contained"
+            sx={{ width: "50%" }}
+            onClick={handleSubmit}
+          >
+            Sign up
+          </Button>
+        )}
+
         <Box sx={{ display: "flex", alignItems: "center", gap: ".5rem" }}>
           <p>Already have an account?</p>
           <Link className="link" to="/sign-in">

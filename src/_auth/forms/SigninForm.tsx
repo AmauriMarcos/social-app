@@ -8,6 +8,7 @@ import {
   Box,
   InputAdornment,
   IconButton,
+  CircularProgress,
 } from "@mui/material";
 import "../../scss/signinForm.scss";
 import { Link } from "react-router-dom";
@@ -19,8 +20,10 @@ const SigninForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { emailError, passwordError, validateEmail, validatePassword } = useValidation();
+  const { emailError, passwordError, validateEmail, validatePassword } =
+    useValidation();
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
@@ -109,13 +112,23 @@ const SigninForm = () => {
             ),
           }}
         />
-        <Button
-          variant="contained"
-          sx={{ width: "50%" }}
-          onClick={handleSubmit}
-        >
-          Log in
-        </Button>
+        {isLoading ? (
+         <Button variant="contained" sx={{ width: "50%" }}>
+         <CircularProgress
+           color="inherit"
+           style={{ width: "24px", height: "24px", marginRight: "1rem" }}
+         />{" "}
+         Loading...
+       </Button>
+        ) : (
+          <Button
+            variant="contained"
+            sx={{ width: "50%" }}
+            onClick={handleSubmit}
+          >
+            Log in
+          </Button>
+        )}
         <Box sx={{ display: "flex", alignItems: "center", gap: ".5rem" }}>
           <p>Don't have an account?</p>
           <Link className="link" to="/sign-up">
