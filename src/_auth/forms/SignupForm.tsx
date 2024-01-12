@@ -11,20 +11,31 @@ import {
   CircularProgress,
 } from "@mui/material";
 import "../../scss/signinForm.scss";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { MarkEmailReadSharp } from "@mui/icons-material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import useValidation from "../../utils/useValidation";
-import { createUserAccount } from "../../lib/appwrite/api";
+import { AlertColor } from "@mui/material/Alert";
+import {useCreateUserAccount, useSignInAccount} from '../../lib/react-query/queriesAndMutations';
+import {useUserContext} from '../../context/AuthContext';
 
-const SignupForm = () => {
+type SignupFormProps = {
+  setAlertType: React.Dispatch<React.SetStateAction<AlertColor>>;
+  setAlertOpen: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const SignupForm: React.FC<SignupFormProps> = ({
+  setAlertType,
+  setAlertOpen,
+}) => {
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const {checkAuthUser, isLoading: isUserLoading} = useUserContext();
 
   const {
     nameError,
@@ -52,6 +63,9 @@ const SignupForm = () => {
     const isEmailValid = validateEmail(email);
     const isPasswordValid = validatePassword(password);
 
+    const {mutateAsync: createUserAccount, isLoading: isCreatingUser} = useCreateUserAccount();
+    const {mutateAsync: signInAccount, isLoading: isSigningIn} = useSignInAccount();
+
     if (isNameValid && isUsernameValid && isEmailValid && isPasswordValid) {
       const values = {
         name,
@@ -61,7 +75,30 @@ const SignupForm = () => {
       };
       const newUser = await createUserAccount(values);
       setIsLoading(false);
-      console.log("New user:", newUser);
+
+      if (!newUser) {
+        setAlertOpen(true);
+        setAlertType("error");
+        return;
+      }
+
+      const session = await signInAccount({
+        email: values.email,
+        password: values.password
+      });
+
+      if(!session){
+        setAlertOpen(true);
+        setAlertType("error");
+        return;
+      }
+
+      const isLoggedIn = await checkAuthUser();
+
+     /*  setAlertOpen(true);
+      setAlertType("success");
+      <Navigate to="/" />;
+      console.log("New user:", newUser); */
     }
   };
 
