@@ -13,13 +13,11 @@ export const appwriteConfig = {
 
 export const client = new Client();
 
-
 client.setProject(appwriteConfig?.projectId!);
 client.setEndpoint(appwriteConfig?.url!);
 
-
 export const account = new Account(client);
-export { ID } from 'appwrite';
+export { ID, Query } from 'appwrite';
 export const databases = new Databases(client);
 export const storage = new Storage(client);
 export const avatars= new Avatars(client);

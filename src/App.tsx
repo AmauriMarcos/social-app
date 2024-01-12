@@ -7,8 +7,21 @@ import SignupForm from "./_auth/forms/SignupForm";
 import { Home } from "./_root/pages/index";
 import AuthLayout from "./_auth/AuthLayout";
 import RootLayout from "./_root/RootLayout";
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert, { AlertProps, AlertColor } from '@mui/material/Alert';
+
+
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
+  props,
+  ref,
+) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const App = () => {
+  const [openAlert, setAlertOpen] = React.useState(false);
+  const [alertType, setAlertType] = React.useState<AlertColor>('success');
+
   const theme = createTheme({
     palette: {
       mode: "dark",
@@ -23,15 +36,25 @@ const App = () => {
       ].join(","),
     },
   });
+
+  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setAlertOpen(false);
+  };
+
   return (
     <ThemeProvider theme={theme}>
+
       <CssBaseline />
       <main style={{ height: "100vh" }}>
         <Routes>
           {/* public routes */}
           <Route element={<AuthLayout />}>
             <Route path="/sign-in" element={<SigninForm />} />
-            <Route path="/sign-up" element={<SignupForm />} />
+            <Route path="/sign-up" element={<SignupForm setAlertType={setAlertType} setAlertOpen={setAlertOpen} />} />
           </Route>
 
           {/* private routes */}
@@ -39,7 +62,13 @@ const App = () => {
             <Route index element={<Home />} />
           </Route>
         </Routes>
+        <Snackbar open={openAlert} autoHideDuration={6000} onClose={handleClose}>
+          <Alert onClose={handleClose} severity={alertType} sx={{ width: '100%' }}>
+            This is a success message!
+          </Alert>
+        </Snackbar>
       </main>
+      
     </ThemeProvider>
   );
 };
